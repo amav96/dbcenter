@@ -18,14 +18,10 @@ DB_PASSWORD=dbrootpassword
 
 ## Levantar database
 
-docker-compose up -d
-
-
-## entrar por bas
-
-docker container exec -it mysql bash
-y adentro
-mysql -u root -p
+Docker
+- docker-compose up -d 
+MakeFile
+- make run
 
 ## entrar a mysql por consola
 
