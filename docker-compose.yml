@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: mysql
+    restart: always
+    ports:
+      - 23306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    #no usar esta config para produccion
+    environment:
+      MYSQL_ROOT_PASSWORD: dbrootpassword
+      MYSQL_USER: database_user
+      MYSQL_PASSWORD: database_password
+    
+    volumes:
+      - db-volume:/var/lib/mysql
+    networks:
+      db_center_net:
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_USER: gis_user
+      POSTGRES_PASSWORD: gis_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - db_center_net
+    ports:
+      - 25432:5432
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    networks:
+      - db_center_net
+    container_name: phpmyadmin
+    hostname: phpmyadmin
+    ports:
+      # Puerto externo 7000 mapea al 80
+      - 7000:80
+    environment:
+      PMA_HOST: mysql
+      MYSQL_USER: database_user
+      MYSQL_PASSWORD: database_password
+      MYSQL_ROOT_PASSWORD: dbrootpassword
+      # variable para indicar el maximo de carga al importar
+      UPLOAD_LIMIT: 200000k
+
+volumes:
+  db-volume: ~ 
+  postgres-data: ~
+networks:
+  db_center_net:
+    name: db_center_net
+    driver: bridge
+
+
